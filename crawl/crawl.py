@@ -31,7 +31,7 @@ class CrawlProxy(object):
         else:
             return lis[0]
 
-    def proxy_xici(self):
+    def proxy__xici(self):
         print("*Start -> XiCi Proxy")
         base_url = "http://www.xicidaili.com/nn/"
         start = 1
@@ -60,7 +60,7 @@ class CrawlProxy(object):
         print("*Finish -> XiCi Proxy")
         return origin
 
-    def proxy_xundaili(self):
+    def proxy__xundaili(self):
         print("*Start -> XunDaiLi Proxy")
         # 10分钟更新一次
         url = "http://www.xdaili.cn/ipagent//freeip/getFreeIps?page=1&rows=10"
@@ -79,7 +79,7 @@ class CrawlProxy(object):
         print("*Finish -> XunDaiLi Proxy")
         return items
 
-    def proxy_wuyou(self):
+    def proxy__wuyou(self):
         print("*Start -> WuYou Proxy")
         url = "http://www.data5u.com/free/gngn/index.shtml"
         response = requests.get(url=url, headers=self.headers, timeout=10)
@@ -97,13 +97,17 @@ class CrawlProxy(object):
         return items
 
 c = CrawlProxy()
-jobs = [
-    gevent.spawn(c.proxy_wuyou),
-    gevent.spawn(c.proxy_xundaili),
-    gevent.spawn(c.proxy_xici),
-]
 
+# 动态获取对象方法
+jobs = []
+for attr in dir(c):
+    if attr.startswith("proxy__"):
+        obj = getattr(c, attr, None)
+        jobs.append(gevent.spawn(obj))
+# 使用协程执行采集程序，并返回结果
 results = gevent.joinall(jobs)
+
+# 遍历采集的每个item
 for result in results:
     for value in result.value:
         print(value)
