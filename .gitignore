@@ -99,3 +99,11 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# pycharm
+.idea
+.idea/
+.xml
+
+# jupiter_notebook
+.ipynb_checkpoints
