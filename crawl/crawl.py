@@ -60,6 +60,7 @@ class CrawlProxy(object):
         print("*Finish -> XiCi Proxy")
         return origin
 
+    # 讯代理
     def proxy__xundaili(self):
         print("*Start -> XunDaiLi Proxy")
         # 10分钟更新一次
@@ -79,6 +80,7 @@ class CrawlProxy(object):
         print("*Finish -> XunDaiLi Proxy")
         return items
 
+    # 5U代理
     def proxy__wuyou(self):
         print("*Start -> WuYou Proxy")
         url = "http://www.data5u.com/free/gngn/index.shtml"
@@ -96,18 +98,59 @@ class CrawlProxy(object):
         print("*Finish -> WuYou Proxy")
         return items
 
+    # 快代理
+    def proxy_quanwang(self):
+        print("*Start -> XiCi Proxy")
+        base_url = "https://www.kuaidaili.com/free/inha/"  # ".shtml"
+        start = 1
+        end = 3
+        def parse_info(offset):
+            url = base_url + str(offset) + ".shtml"
+            response = requests.get(url=url, headers=self.headers, timeout=10)
+            print("***run -> XiCi Proxy", url, response)
+
+            # 解析页面过程不一样
+            """
+            b.getchildren
+            a = html.xpath("//table/tbody/tr/td[1]") 
+            """
+            html = etree.HTML(response.text)
+            rows = html.xpath("//table[@id='ip_list']//tr")
+            items = []
+            for row in rows:
+                item = {}
+                item['ip'] = self.if_empty_list(row, "./td[2]/text()")
+                item['port'] = self.if_empty_list(row, "./td[3]/text()")
+                item['protocol'] = self.if_empty_list(row, "./td[6]/text()")
+                items.append(item)
+            return items
+        jobs = [gevent.spawn(parse_info, offset) for offset in range(start, end)]
+
+        result = gevent.joinall(jobs)
+        results = [ge_obj.value for ge_obj in result]
+        origin = []
+        for value in results:
+            origin.extend(value)
+        print("*Finish -> XiCi Proxy")
+        return origin
+
+
+
 c = CrawlProxy()
 
-# 动态获取对象方法
-jobs = []
-for attr in dir(c):
-    if attr.startswith("proxy__"):
-        obj = getattr(c, attr, None)
-        jobs.append(gevent.spawn(obj))
-# 使用协程执行采集程序，并返回结果
-results = gevent.joinall(jobs)
+c.proxy_quanwang()
 
-# 遍历采集的每个item
-for result in results:
-    for value in result.value:
-        print(value)
+# # 动态获取对象方法
+# jobs = []
+# for attr in dir(c):
+#     if attr.startswith("proxy__"):
+#         if attr not in []:
+#             obj = getattr(c, attr, None)
+#             jobs.append(gevent.spawn(obj))
+# # 使用协程执行采集程序，并返回结果
+# results = gevent.joinall(jobs)
+#
+# # 遍历采集的每个item
+# for result in results:
+#     for value in result.value:
+#         print(value)
