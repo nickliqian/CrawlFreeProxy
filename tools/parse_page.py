@@ -90,6 +90,7 @@ class ManyPage(object):
         print("退出")
 
 
+# 扩展自定义函数应对反爬措施
 class ExtraAction(object):
 
     def __init__(self):
@@ -135,3 +136,6 @@ class ExtraAction(object):
                         n = ''
                     m += n
             print(m)
+
+    def deal(self):
+        pass
