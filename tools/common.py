@@ -1,6 +1,6 @@
 # 如果是http请求使用协程，需要导入patch_socket
-from gevent import monkey;monkey.patch_socket();monkey.patch_ssl()
-import gevent
+# from gevent import monkey;monkey.patch_socket();monkey.patch_ssl()
+# import gevent
 import requests
 from lxml import etree
 import time
@@ -80,16 +80,16 @@ class BasePage(object):
         print("*Finish -> {} Proxy".format(self.site_name))
         return origin
 
-    # 异步抓取，使用协程提高采集性能
-    def async_crawl(self):
-        jobs = [gevent.spawn(self.parse_page, offset) for offset in range(self.start, self.end + 1)]
-        result = gevent.joinall(jobs)
-        results = [ge_obj.value for ge_obj in result]
-        origin = []
-        for value in results:
-            origin.extend(value)
-        print("*Finish -> {} Proxy".format(self.site_name))
-        return origin
+    # # 异步抓取，使用协程提高采集性能
+    # def async_crawl(self):
+    #     jobs = [gevent.spawn(self.parse_page, offset) for offset in range(self.start, self.end + 1)]
+    #     result = gevent.joinall(jobs)
+    #     results = [ge_obj.value for ge_obj in result]
+    #     origin = []
+    #     for value in results:
+    #         origin.extend(value)
+    #     print("*Finish -> {} Proxy".format(self.site_name))
+    #     return origin
 
     # 采集，会根据配置选中是否异步
     def crawl(self):
@@ -97,7 +97,8 @@ class BasePage(object):
             data = self.parse_page('')
         else:
             if self.sync_support:
-                data = self.async_crawl()
+                # data = self.async_crawl()
+                data = self.order_crawl()
             else:
                 data = self.order_crawl()
         return data
