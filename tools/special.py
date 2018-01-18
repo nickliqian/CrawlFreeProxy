@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 from tools.common import BasePage
+import time
 
 
 # 全网代理 扩展自定义函数应对反爬措施
@@ -28,7 +29,15 @@ class QuanWang(BasePage):
     # 规则重写
     def rule(self, response):
         soup = BeautifulSoup(response.text, "html.parser")
-        rows = soup.tbody.findAll("tr")
+        while True:
+            try:
+                rows = soup.tbody.findAll("tr")
+                break
+            except Exception as e:
+                print(e)
+                with open("./quanwangerror.html", "w") as f:
+                    f.write(response.text)
+                time.sleep(20)
         items = []
         for row in rows:
             try:
