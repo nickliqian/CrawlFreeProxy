@@ -31,20 +31,24 @@ class QuanWang(BasePage):
         rows = soup.tbody.findAll("tr")
         items = []
         for row in rows:
-            item = {}
-            ip_tags = row.td.contents
-            item['protocol'] = row.findAll("td")[2].string
-            full_ip = ''
-            for tag in ip_tags:
-                tag_string = str(tag)
-                if "none" not in tag_string:
-                    if "port" in tag_string:
-                        hash_word = tag.attrs['class'][1]
-                        n = self.get_poxy(hash_word)
-                    else:
-                        n = tag.string
-                    n = '' if not n else n
-                    full_ip += n
-            item['ip'] = full_ip
-            items.append(item)
+            try:
+                item = {}
+                ip_tags = row.td.contents
+                item['protocol'] = row.findAll("td")[2].string
+                full_ip = ''
+                for tag in ip_tags:
+                    tag_string = str(tag)
+                    if "none" not in tag_string:
+                        if "port" in tag_string:
+                            hash_word = tag.attrs['class'][1]
+                            n = self.get_poxy(hash_word)
+                        else:
+                            n = tag.string
+                        n = '' if not n else n
+                        full_ip += n
+                item['ip'] = full_ip
+                items.append(item)
+            except Exception as e:
+                print(e)
+                pass
         return items

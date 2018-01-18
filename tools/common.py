@@ -107,8 +107,9 @@ class BasePage(object):
         while True:
             items = self.crawl()
             if CONN_REDIS:
-                wait(self.cycle)
+                # 保存数据后开始休眠
                 save_proxy_redis(CONN_REDIS, self.redis_store, items)
+                wait(self.cycle)
                 print("存入redis")
             else:
                 return items
