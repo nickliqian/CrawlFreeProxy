@@ -146,11 +146,11 @@ def save_proxy_redis(CONN_REDIS, redis_store, items):
 
     for proxy in items:
         if proxy["protocol"] in ["http", "http,https", "https,http"]:
-            CONN_REDIS.sadd(redis_store+"http", proxy["ip"])
+            CONN_REDIS.rpush(redis_store+"http", proxy["ip"])
         elif proxy["protocol"] in ["sock", "socks", "socket", "socks4/5", "socks4", "socks5"]:
-            CONN_REDIS.sadd(redis_store + "socks", proxy["ip"])
+            CONN_REDIS.rpush(redis_store + "socks", proxy["ip"])
         else:
-            CONN_REDIS.sadd(redis_store + "https", proxy["ip"])
+            CONN_REDIS.rpush(redis_store + "https", proxy["ip"])
 
 
 # 根据规则睡眠采集脚本
