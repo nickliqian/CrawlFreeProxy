@@ -41,7 +41,17 @@ class BasePage(object):
     def parse_page(self, offset):
         url = self.base_url + str(offset) + self.base_url_tail
         print("*Start -> {} Proxy: {}".format(self.site_name, url))
-        response = requests.get(url=url, headers=self.headers, timeout=10)
+
+        while True:
+            try:
+                response = requests.get(url=url, headers=self.headers, timeout=10)
+                if response.text == '':
+                    raise Exception("响应为空")
+                break
+            except Exception as e:
+                print(e)
+                pass
+
         print("***begin -> {} Proxy: {} {}".format(self.site_name, url, response))
         return self.rule(response)
 
@@ -99,6 +109,7 @@ class BasePage(object):
             if CONN_REDIS:
                 wait(self.cycle)
                 save_proxy_redis(CONN_REDIS, self.redis_store, items)
+                print("存入redis")
             else:
                 return items
 
