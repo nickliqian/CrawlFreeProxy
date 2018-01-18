@@ -3,7 +3,7 @@ from tools.special import QuanWang
 
 
 # 快代理 带CONN_REDIS参数就会循环的采集并存入redis，如果不带就会返回单次采集的集合 [{}, {}, ...]
-def proxy__kuai(CONN_REDIS=None):
+def proxy__kuai(CONN_REDIS):
     base_url = "https://www.kuaidaili.com/free/inha/"
     base_url_tail = ''
     start = 1
@@ -24,7 +24,7 @@ def proxy__kuai(CONN_REDIS=None):
 
 
 # 西刺代理
-def proxy__xici(CONN_REDIS=None):
+def proxy__xici(CONN_REDIS):
     base_url = "http://www.xicidaili.com/nn/"
     base_url_tail = ''
     start = 1
@@ -46,7 +46,7 @@ def proxy__xici(CONN_REDIS=None):
 
 
 # 年少代理
-def proxy__nianshao(CONN_REDIS=None):
+def proxy__nianshao(CONN_REDIS):
     base_url = "http://www.nianshao.me/?page="
     base_url_tail = ''
     start = 1
@@ -67,7 +67,7 @@ def proxy__nianshao(CONN_REDIS=None):
 
 
 # 云代理
-def proxy__ip3366(CONN_REDIS=None):
+def proxy__ip3366(CONN_REDIS):
     base_url = "http://www.ip3366.net/free/?stype=3&page="
     base_url_tail = ''
     start = 1
@@ -88,7 +88,7 @@ def proxy__ip3366(CONN_REDIS=None):
 
 
 # IP海
-def proxy__iphai(CONN_REDIS=None):
+def proxy__iphai(CONN_REDIS):
     base_url = "http://www.iphai.com/free/ng"
     base_url_tail = ''
     start = ''
@@ -109,7 +109,7 @@ def proxy__iphai(CONN_REDIS=None):
 
 
 # 5U代理 10min 1p
-def proxy__wuyou(CONN_REDIS=None):
+def proxy__wuyou(CONN_REDIS):
     base_url = "http://www.data5u.com/free/gngn/index.shtml"
     base_url_tail = ''
     start = ''
@@ -130,7 +130,7 @@ def proxy__wuyou(CONN_REDIS=None):
 
 
 # 全网代理 10min 5
-def proxy__quanwang(CONN_REDIS=None):
+def proxy__quanwang(CONN_REDIS):
     Spider = QuanWang(start=1, end=20, cycle="10min")  # 5p
     items = Spider.run(CONN_REDIS)
     return items

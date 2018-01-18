@@ -1,5 +1,4 @@
-from gevent import monkey;monkey.patch_socket();monkey.patch_ssl();monkey.patch_time()
-import gevent
+import threading
 import redis
 from tools.settings import *
 
@@ -14,7 +13,11 @@ if __name__ == '__main__':
         if attr.startswith("proxy__"):
             if attr not in ["proxy__test"]:
                 # 所有proxy__开头的方法都加入jobs列表
-                jobs.append(gevent.spawn(locals()[attr], CONN_REDIS))
+                jobs.append(threading.Thread(target=locals()[attr], args=(CONN_REDIS,)))
 
-    # 使用协程执行jobs列表中的函数，并返回结果
-    results = gevent.joinall(jobs)
+    # 开启多线程
+    for t in jobs:
+        t.start()
+
+    for t in jobs:
+        t.join()
