@@ -5,7 +5,6 @@ import requests
 from lxml import etree
 import time
 import json
-from bs4 import BeautifulSoup
 
 """
     exp_dic = {
@@ -16,10 +15,9 @@ from bs4 import BeautifulSoup
 }
 """
 
-
 # 解析页面基础类
 class BasePage(object):
-    def __init__(self, base_url='', base_url_tail='', start=1, end=1, site_name="SiteName", exp_dic=None, sync_support=False):
+    def __init__(self, base_url='', base_url_tail='', start=1, end=1, site_name="SiteName", exp_dic=None, sync_support=False, cycle="2h", redis_store="test"):
         self.headers = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko)"
                                       " Chrome/62.0.3202.62 Safari/537.36", }
         self.base_url = base_url
@@ -29,6 +27,8 @@ class BasePage(object):
         self.site_name = site_name
         self.exp_dic = exp_dic
         self.sync_support = sync_support
+        self.cycle = cycle
+        self.redis_store = redis_store
 
     # 使用xpath解析，如果解析为空就返回None，避免抛出异常
     def if_empty_list(self, dom, flag):
@@ -40,7 +40,7 @@ class BasePage(object):
 
     def parse_page(self, offset):
         url = self.base_url + str(offset) + self.base_url_tail
-        print("***begin -> {} Proxy: {}".format(self.site_name, url))
+        print("*Start -> {} Proxy: {}".format(self.site_name, url))
         response = requests.get(url=url, headers=self.headers, timeout=10)
         print("***begin -> {} Proxy: {} {}".format(self.site_name, url, response))
         return self.rule(response)
@@ -66,7 +66,7 @@ class BasePage(object):
         for offset in range(self.start, self.end+1):
             items = self.parse_page(offset)
             origin.extend(items)
-            time.sleep(1.5)
+            time.sleep(3)
         print("*Finish -> {} Proxy".format(self.site_name))
         return origin
 
@@ -81,7 +81,7 @@ class BasePage(object):
         print("*Finish -> {} Proxy".format(self.site_name))
         return origin
 
-    # 运行，会根据配置选中是否异步
+    # 采集，会根据配置选中是否异步
     def crawl(self):
         if self.start == '' or self.end == '':
             data = self.parse_page('')
@@ -92,9 +92,19 @@ class BasePage(object):
                 data = self.order_crawl()
         return data
 
+    # 运行包括采集和储存
+    def run(self, CONN_REDIS=None):
+        while True:
+            items = self.crawl()
+            if CONN_REDIS:
+                wait(self.cycle)
+                save_proxy_redis(CONN_REDIS, self.redis_store, items)
+            else:
+                return items
+
     # 退出/清除占用内存
     def __del__(self):
-        print("退出")
+        print("{} Spider Exit".format(self.site_name))
 
 
 # 解析通用表格类型页面
@@ -116,3 +126,50 @@ class CommonTabelPage(BasePage):
                 item['protocol'] = self.if_empty_list(row, "protocol").lower()
                 items.append(item)
         return items
+
+
+# 把items保存到指定的redis集合里面
+def save_proxy_redis(CONN_REDIS, redis_store, items):
+
+    for proxy in items:
+        if proxy["protocol"] in ["http", "http,https", "https,http"]:
+            CONN_REDIS.sadd(redis_store+"http", proxy["ip"])
+        elif proxy["protocol"] in ["sock", "socks", "socket", "socks4/5", "socks4", "socks5"]:
+            CONN_REDIS.sadd(redis_store + "socks", proxy["ip"])
+        else:
+            CONN_REDIS.sadd(redis_store + "https", proxy["ip"])
+
+
+# 根据规则睡眠采集脚本
+def wait(string):
+    if string.endswith("h"):
+        num = string.replace("h", "")
+        print("等待%s小时" % num)
+        time.sleep(int(num)*3600)
+    elif string.endswith("min"):
+        num = string.replace("min", "")
+        print("等待%s分钟" % num)
+        time.sleep(int(num)*60)
+    else:
+        raise TypeError("参数异常")
+
+
+def test_proxy(proxy):
+
+    if proxy["protocol"] in ["http", "http,https", "https,http"]:
+        proxies = {"http": proxy["ip"]}
+    else:
+        proxies = {"https": proxy["ip"]}
+
+    url = "http://httpbin.org/ip"
+    print(proxies)
+
+    while True:
+        try:
+            response = requests.get(url, proxies=proxies, timeout=10)
+            print(response.status_code)
+            if response.status_code == '200':
+                print(proxies, "sucess!")
+                break
+        except:
+            pass

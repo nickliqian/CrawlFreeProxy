@@ -4,13 +4,14 @@ from tools.common import BasePage
 
 # 全网代理 扩展自定义函数应对反爬措施
 class QuanWang(BasePage):
-
     def __init__(self, *args, **kwargs):
         super(QuanWang, self).__init__(*args, **kwargs)
         self.base_url = "http://www.goubanjia.com/free/gngn/index"
         self.base_url_tail = ".shtml"
         self.site_name = "QuanWang"
         self.sync_support = False
+        self.cycle = '10min'
+        self.redis_store = "freeProxy:BeforeVerify"
 
     # 端口加密破解
     @staticmethod
@@ -47,6 +48,3 @@ class QuanWang(BasePage):
             item['ip'] = full_ip
             items.append(item)
         return items
-
-
-
