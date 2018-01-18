@@ -1,9 +1,11 @@
-from tools.parse_page import ManyPage
+from tools.common import CommonTabelPage
+from tools.special import QuanWang
 
 
 # 快代理
-def kuai():
+def proxy_kuai():
     base_url = "https://www.kuaidaili.com/free/inha/"
+    base_url_tail = ''
     start = 1
     end = 2
     site_name = "Kuai"
@@ -15,14 +17,15 @@ def kuai():
         "exp_row_port": "./td[2]/text()",
         "exp_row_protocol": "./td[4]/text()",
     }
-    m = ManyPage(base_url, start, end, site_name, exp_dic, sync_support)
-    a = m.crawl()
-    print(a)
+    Spider = CommonTabelPage(base_url, base_url_tail, start, end, site_name, exp_dic, sync_support)
+    items = Spider.crawl()
+    [print(i) for i in items]
 
 
 # 西刺代理
-def xici():
+def proxy_xici():
     base_url = "http://www.xicidaili.com/nn/"
+    base_url_tail = ''
     start = 1
     end = 2
     site_name = "XiCi"
@@ -35,14 +38,15 @@ def xici():
         "exp_row_port": "./td[3]/text()",
         "exp_row_protocol": "./td[6]/text()",
     }
-    m = ManyPage(base_url, start, end, site_name, exp_dic, sync_support)
-    a = m.crawl()
-    print(a)
+    Spider = CommonTabelPage(base_url, base_url_tail, start, end, site_name, exp_dic, sync_support)
+    items = Spider.crawl()
+    [print(i) for i in items]
 
 
 # 年少代理
-def nianshao():
+def proxy_nianshao():
     base_url = "http://www.nianshao.me/?page="
+    base_url_tail = ''
     start = 1
     end = 2
     site_name = "NiaoShao"
@@ -54,14 +58,15 @@ def nianshao():
         "exp_row_port": "./td[2]/text()",
         "exp_row_protocol": "./td[5]/text()",
     }
-    m = ManyPage(base_url, start, end, site_name, exp_dic, sync_support)
-    a = m.crawl()
-    print(a)
+    Spider = CommonTabelPage(base_url, base_url_tail, start, end, site_name, exp_dic, sync_support)
+    items = Spider.crawl()
+    [print(i) for i in items]
 
 
 # 云代理
-def ip3366():
+def proxy_ip3366():
     base_url = "http://www.ip3366.net/free/?stype=1"
+    base_url_tail = ''
     start = 1
     end = 2
     site_name = "IP3366"
@@ -73,13 +78,14 @@ def ip3366():
         "exp_row_port": "./td[2]/text()",
         "exp_row_protocol": "./td[4]/text()",
     }
-    m = ManyPage(base_url, start, end, site_name, exp_dic, sync_support)
-    a = m.crawl()
-    print(a)
+    Spider = CommonTabelPage(base_url, base_url_tail, start, end, site_name, exp_dic, sync_support)
+    items = Spider.crawl()
+    [print(i) for i in items]
 
 # IP海
-def iphai():
+def proxy_iphai():
     base_url = "http://www.iphai.com/free/ng"
+    base_url_tail = ''
     start = ''
     end = ''
     site_name = "IP3366"
@@ -91,13 +97,14 @@ def iphai():
         "exp_row_port": "./td[2]/text()",
         "exp_row_protocol": "./td[4]/text()",
     }
-    m = ManyPage(base_url, start, end, site_name, exp_dic, sync_support)
-    a = m.crawl()
-    print(a)
+    Spider = CommonTabelPage(base_url, base_url_tail, start, end, site_name, exp_dic, sync_support)
+    items = Spider.crawl()
+    [print(i) for i in items]
 
 # 5U代理 10min 1p
-def wuyou():
+def proxy_wuyou():
     base_url = "http://www.data5u.com/free/gngn/index.shtml"
+    base_url_tail = ''
     start = ''
     end = ''
     site_name = "WuYou"
@@ -109,9 +116,28 @@ def wuyou():
         "exp_row_port": "./span[2]/li/text()",
         "exp_row_protocol": "./span[4]/li/a/text()",
     }
-    m = ManyPage(base_url, start, end, site_name, exp_dic, sync_support)
-    a = m.crawl()
-    print(a)
+    Spider = CommonTabelPage(base_url, base_url_tail, start, end, site_name, exp_dic, sync_support)
+    items = Spider.crawl()
+    [print(i) for i in items]
 
 
-wuyou()
+# 全网代理 10min 5
+def proxy_quanwang():
+    start = 1
+    end = 2
+    time = '10min'  # 5p
+    Spider = QuanWang(start, end)
+    items = Spider.crawl()
+    [print(i) for i in items]
+
+
+if __name__ == '__main__':
+
+    proxy_kuai()
+    # proxy_xici()
+    # proxy_nianshao()
+    # proxy_ip3366()
+    # proxy_iphai()
+    # proxy_wuyou()
+    # proxy_quanwang()
+

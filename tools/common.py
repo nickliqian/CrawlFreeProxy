@@ -17,11 +17,13 @@ from bs4 import BeautifulSoup
 """
 
 
-class ManyPage(object):
-    def __init__(self, base_url, start, end, site_name, exp_dic, sync_support=False):
+# 解析页面基础类
+class BasePage(object):
+    def __init__(self, base_url='', base_url_tail='', start=1, end=1, site_name="SiteName", exp_dic=None, sync_support=False):
         self.headers = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko)"
                                       " Chrome/62.0.3202.62 Safari/537.36", }
         self.base_url = base_url
+        self.base_url_tail = base_url_tail
         self.start = start
         self.end = end
         self.site_name = site_name
@@ -37,10 +39,14 @@ class ManyPage(object):
             return lis[0].strip()
 
     def parse_page(self, offset):
-        url = self.base_url + str(offset)
+        url = self.base_url + str(offset) + self.base_url_tail
         print("***begin -> {} Proxy: {}".format(self.site_name, url))
         response = requests.get(url=url, headers=self.headers, timeout=10)
         print("***begin -> {} Proxy: {} {}".format(self.site_name, url, response))
+        return self.rule(response)
+
+    # 解析规则
+    def rule(self, response):
         html = etree.HTML(response.text)
         rows = html.xpath(self.exp_dic["exp_rows"])
         items = []
@@ -60,6 +66,7 @@ class ManyPage(object):
         for offset in range(self.start, self.end+1):
             items = self.parse_page(offset)
             origin.extend(items)
+            time.sleep(1.5)
         print("*Finish -> {} Proxy".format(self.site_name))
         return origin
 
@@ -85,57 +92,27 @@ class ManyPage(object):
                 data = self.order_crawl()
         return data
 
-    # 退出/清楚暂用内存
+    # 退出/清除占用内存
     def __del__(self):
         print("退出")
 
 
-# 扩展自定义函数应对反爬措施
-class ExtraAction(object):
+# 解析通用表格类型页面
+class CommonTabelPage(BasePage):
+    def __init__(self, *args, **kwargs):
+        super(CommonTabelPage, self).__init__(*args, **kwargs)
 
-    def __init__(self):
-        self.headers = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) "
-                                 "Chrome/62.0.3202.62 Safari/537.36", }
-    @staticmethod
-    def get_poxy(port_word):
-        # print("start..")
-        # print(port_word)
-        # _, word = port_word.split(' ')
-        num_list = []
-        for item in port_word:
-            num = 'ABCDEFGHIZ'.find(item)
-            num_list.append(str(num))
-
-        port = int("".join(num_list)) >> 0x3
-        port = str(port)
-        return port
-
-    def crawl_quanwang(self):
-        url = "http://www.goubanjia.com/free/gngn/index.shtml"
-        r = requests.get(url=url, headers=self.headers)
-        r = r.text
-
-        # with open("./quanwang.html", "r") as f:
-        #     r = f.read()
-
-        soup = BeautifulSoup(r, "html.parser")
-        ips = soup.tbody.findAll("tr")
-        for ip in ips:
-            b = ip.td
-            c = b.contents
-            m = ''
-            for i in c:
-                s = str(i)
-                if "none" not in s:
-                    if "port" in s:
-                        mix = i.attrs['class'][1]
-                        n = self.get_poxy(mix)
-                    else:
-                        n = i.string
-                    if not n:
-                        n = ''
-                    m += n
-            print(m)
-
-    def deal(self):
-        pass
+    # 解析规则
+    def rule(self, response):
+        html = etree.HTML(response.text)
+        rows = html.xpath(self.exp_dic["exp_rows"])
+        items = []
+        for row in rows:
+            item = {}
+            ip = self.if_empty_list(row, "ip")
+            port = self.if_empty_list(row, "port")
+            if ip and port:
+                item['ip'] = ip + ":" + port
+                item['protocol'] = self.if_empty_list(row, "protocol").lower()
+                items.append(item)
+        return items
