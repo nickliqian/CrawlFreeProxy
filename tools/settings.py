@@ -68,7 +68,7 @@ def proxy__nianshao(CONN_REDIS):
 
 # 云代理
 def proxy__ip3366(CONN_REDIS):
-    base_url = "http://www.ip3366.net/free/?stype=3&page="
+    base_url = "http://www.ip3366.net/free/?stype=1&page="
     base_url_tail = ''
     start = 1
     end = 7

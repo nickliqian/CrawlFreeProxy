@@ -17,7 +17,7 @@ import json
 
 # 解析页面基础类
 class BasePage(object):
-    def __init__(self, base_url='', base_url_tail='', start=1, end=1, site_name="SiteName", exp_dic=None, sync_support=False, cycle="2h", redis_store="test"):
+    def __init__(self, base_url='', base_url_tail='', start=1, end=1, site_name="SiteName", exp_dic=None, sync_support=False, cycle="2h", redis_store="test", delay_time=5):
         self.headers = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko)"
                                       " Chrome/62.0.3202.62 Safari/537.36", }
         self.base_url = base_url
@@ -29,6 +29,7 @@ class BasePage(object):
         self.sync_support = sync_support
         self.cycle = cycle
         self.redis_store = redis_store
+        self.delay_time = delay_time
 
     # 使用xpath解析，如果解析为空就返回None，避免抛出异常
     def if_empty_list(self, dom, flag):
@@ -76,7 +77,7 @@ class BasePage(object):
         for offset in range(self.start, self.end+1):
             items = self.parse_page(offset)
             origin.extend(items)
-            time.sleep(5)
+            time.sleep(self.delay_time)
         print("*Finish -> {} Proxy".format(self.site_name))
         return origin
 
