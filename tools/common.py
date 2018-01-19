@@ -146,11 +146,11 @@ def save_proxy_redis(CONN_REDIS, redis_store, items):
 
     for proxy in items:
         if proxy["protocol"] in ["http", "http,https", "https,http"]:
-            CONN_REDIS.rpush(redis_store+"http", proxy["ip"])
+            CONN_REDIS.sadd(redis_store+"http", proxy["ip"])
         elif proxy["protocol"] in ["sock", "socks", "socket", "socks4/5", "socks4", "socks5"]:
-            CONN_REDIS.rpush(redis_store + "socks", proxy["ip"])
+            CONN_REDIS.sadd(redis_store + "socks", proxy["ip"])
         else:
-            CONN_REDIS.rpush(redis_store + "https", proxy["ip"])
+            CONN_REDIS.sadd(redis_store + "https", proxy["ip"])
 
 
 # 根据规则睡眠采集脚本
@@ -168,21 +168,23 @@ def wait(string):
 
 
 # http proxy test
-def test_proxy(proxy):
+def test_http_proxy(proxy):
     proxies = {"http": proxy}
-
-    url = "http://httpbin.org/ip"
-    print(proxies)
+    url = "http://www.baidu.com"
+    print("*Start proxy test: ", proxies)
 
     i = 1
     while i<=3:
+        print("---------------Test %d-----------------" % i)
         try:
             response = requests.get(url, proxies=proxies, timeout=10)
-            print(response.status_code)
-            if response.status_code == '200':
-                print(proxies, "sucess!")
+            if response.status_code == 200:
+                print("*Response is 200,", proxies, "pass the test!")
+                flag = True
                 break
         except Exception as e:
-            print(e)
+            print("Something Error as", e)
+            flag = False
             i += 1
     print("end")
+    return flag
