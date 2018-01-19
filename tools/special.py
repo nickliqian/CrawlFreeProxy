@@ -38,7 +38,7 @@ class QuanWang(BasePage):
                 with open("./quanwangerror.html", "w") as f:
                     f.write(response.url)
                     f.write(response.text)
-                time.sleep(20)
+                time.sleep(300)
         items = []
         for row in rows:
             try:

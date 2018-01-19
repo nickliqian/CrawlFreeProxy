@@ -172,6 +172,7 @@ def test_http_proxy(proxy):
     proxies = {"http": proxy}
     url = "http://www.baidu.com"
     print("*Start proxy test: ", proxies)
+    flag = True
 
     i = 1
     while i<=3:
@@ -182,9 +183,13 @@ def test_http_proxy(proxy):
                 print("*Response is 200,", proxies, "pass the test!")
                 flag = True
                 break
+            else:
+                print("Response code is %d, sleep 60s and continue" % response.status_code)
+                time.sleep(60)
+                i += 1
         except Exception as e:
             print("Something Error as", e)
             flag = False
             i += 1
-    print("end")
+    print("----------------Test end-------------------\n")
     return flag
