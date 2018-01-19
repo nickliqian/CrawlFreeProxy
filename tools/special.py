@@ -34,8 +34,9 @@ class QuanWang(BasePage):
                 rows = soup.tbody.findAll("tr")
                 break
             except Exception as e:
-                print(e)
+                print(e, response.url)
                 with open("./quanwangerror.html", "w") as f:
+                    f.write(response.url)
                     f.write(response.text)
                 time.sleep(20)
         items = []

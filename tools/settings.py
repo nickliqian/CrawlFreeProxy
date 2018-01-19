@@ -131,6 +131,6 @@ def proxy__wuyou(CONN_REDIS):
 
 # 全网代理 10min 5
 def proxy__quanwang(CONN_REDIS):
-    Spider = QuanWang(start=1, end=20, cycle="10min")  # 5p
+    Spider = QuanWang(start=1, end=20, cycle="20min")  # 5p
     items = Spider.run(CONN_REDIS)
     return items
