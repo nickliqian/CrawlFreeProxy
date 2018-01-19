@@ -29,6 +29,7 @@ def loop_test(name):
     print("*Start thread task %s" % name)
     while True:
         result = http_task()
+        print("\n")
         if result == 0:
             break
 
@@ -36,7 +37,7 @@ def loop_test(name):
 if __name__ == "__main__":
 
     jobs = []
-    num = 3
+    num = 8
     for i in range(1, num+1):
         name = "Thread-" + str(i)
         jobs.append(threading.Thread(target=loop_test, args=(name,)))

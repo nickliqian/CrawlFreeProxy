@@ -170,6 +170,9 @@ def wait(string):
 # http proxy test
 def test_http_proxy(proxy):
     proxies = {"http": proxy}
+
+    url
+
     url = "http://www.baidu.com"
     print("*Start proxy test: ", proxies)
     flag = True
@@ -191,5 +194,5 @@ def test_http_proxy(proxy):
             print("Something Error as", e)
             flag = False
             i += 1
-    print("----------------Test end-------------------\n")
+    print("----------------Test end-------------------")
     return flag
