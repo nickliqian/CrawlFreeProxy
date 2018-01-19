@@ -45,7 +45,7 @@ def proxy__xici(CONN_REDIS):
     return items
 
 
-# 年少代理
+# 年少代理 含有很多国外代理，暂时弃用
 def proxy__nianshao(CONN_REDIS):
     base_url = "http://www.nianshao.me/?page="
     base_url_tail = ''
@@ -71,9 +71,9 @@ def proxy__ip3366(CONN_REDIS):
     base_url = "http://www.ip3366.net/free/?stype=3&page="
     base_url_tail = ''
     start = 1
-    end = 10
+    end = 7
     site_name = "IP3366"
-    cycle = '6h'  # 5p
+    cycle = '6h'  # 7p
     sync_support = False
     redis_store = "freeProxy:BeforeVerify"
     exp_dic = {
@@ -131,6 +131,9 @@ def proxy__wuyou(CONN_REDIS):
 
 # 全网代理 10min 5
 def proxy__quanwang(CONN_REDIS):
-    Spider = QuanWang(start=1, end=20, cycle="20min")  # 5p
+    start = 1
+    end = 20
+    cycle = "20min"
+    Spider = QuanWang(start=start, end=end, cycle=cycle)
     items = Spider.run(CONN_REDIS)
     return items
