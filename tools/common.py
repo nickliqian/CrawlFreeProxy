@@ -76,7 +76,7 @@ class BasePage(object):
         for offset in range(self.start, self.end+1):
             items = self.parse_page(offset)
             origin.extend(items)
-            time.sleep(3)
+            time.sleep(5)
         print("*Finish -> {} Proxy".format(self.site_name))
         return origin
 
@@ -167,22 +167,22 @@ def wait(string):
         raise TypeError("参数异常")
 
 
+# http proxy test
 def test_proxy(proxy):
-
-    if proxy["protocol"] in ["http", "http,https", "https,http"]:
-        proxies = {"http": proxy["ip"]}
-    else:
-        proxies = {"https": proxy["ip"]}
+    proxies = {"http": proxy}
 
     url = "http://httpbin.org/ip"
     print(proxies)
 
-    while True:
+    i = 1
+    while i<=3:
         try:
             response = requests.get(url, proxies=proxies, timeout=10)
             print(response.status_code)
             if response.status_code == '200':
                 print(proxies, "sucess!")
                 break
-        except:
-            pass
+        except Exception as e:
+            print(e)
+            i += 1
+    print("end")
