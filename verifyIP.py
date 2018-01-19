@@ -1,5 +1,6 @@
 import redis
 from tools.common import test_http_proxy
+import threading
 
 
 def http_task():
@@ -19,12 +20,31 @@ def http_task():
             CONN_REDIS.sadd("freeProxy:AfterVerifyOKhttp", proxy)
             print("INFO: Save this Proxy IP in freeProxy:AfterVerifyOKhttp")
         else:
+            CONN_REDIS.sadd("freeProxy_Bad:AfterVerifyFailhttp", proxy)
             print("INFO: Abandon this Proxy IP!")
         return 1
 
 
-if __name__ == "__main__":
+def loop_test(name):
+    print("*Start thread task %s" % name)
     while True:
         result = http_task()
         if result == 0:
             break
+
+
+if __name__ == "__main__":
+
+    jobs = []
+    num = 3
+    for i in range(1, num+1):
+        name = "Thread-" + str(i)
+        jobs.append(threading.Thread(target=loop_test, args=(name,)))
+
+    # 开启多线程
+    for t in jobs:
+        t.start()
+
+    for t in jobs:
+        t.join()
+
