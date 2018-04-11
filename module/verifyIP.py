@@ -1,6 +1,7 @@
 import redis
 from tools.common import test_http_proxy
 import threading
+import time
 
 
 def http_task():
@@ -11,7 +12,9 @@ def http_task():
     proxy = CONN_REDIS.spop("freeProxy:BeforeVerifyhttp")
     # 判断redis中ip数量是否为空
     if not proxy:
-        return 0
+        print("等待ip入队列")
+        time.sleep(30)
+        # return 0
     else:
         print("INFO: Get proxy from Redis freeProxy:BeforeVerifyhttp list")
         proxy = str(proxy, encoding="utf-8")
@@ -34,8 +37,7 @@ def loop_test(name):
             break
 
 
-if __name__ == "__main__":
-
+def main():
     jobs = []
     num = 8
     for i in range(1, num+1):
@@ -49,3 +51,6 @@ if __name__ == "__main__":
     for t in jobs:
         t.join()
 
+
+if __name__ == "__main__":
+    main()

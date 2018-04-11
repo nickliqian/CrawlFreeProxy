@@ -1,17 +1,13 @@
-from multiprocessing import Process
 import threading
-import web_app
-from module import verifyIP
 import redis
+from tools.settings import *
 
-
-def crawlIP():
+def main():
 
     POOL = redis.ConnectionPool(host='127.0.0.1', port=6379)
     CONN_REDIS = redis.Redis(connection_pool=POOL)
 
     # 动态获取所有方法
-    from tools.settings import *
     jobs = []
     print(dir())
     for attr in dir():
@@ -27,22 +23,5 @@ def crawlIP():
     for t in jobs:
         t.join()
 
-
-def run_web():
-    web_app.run(host="0.0.0.0", port=7865)
-
-
-def run():
-    print('代理池开始运行')
-
-    crawl_process = Process(target=crawlIP)
-    crawl_process.start()
-
-    verify_process = Process(target=verifyIP.main)
-    verify_process.start()
-
-    web_process = Process(target=run_web)
-    web_process.start()
-
 if __name__ == '__main__':
-    run()
+    main()
