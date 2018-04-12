@@ -30,8 +30,12 @@ def get_proxy():
     :return: 随机代理
     """
     conn = get_conn()
-    return str(conn.srandmember("freeProxy:AfterVerifyOKhttp", 1))
-
+    result = conn.srandmember("freeProxy:AfterVerifyOKhttp", 1)
+    if result:
+        ip = result[0]
+        return ip
+    else:
+        return "HTTP proxies is empty"
 
 @app.route('/random_https')
 def get_proxy_s():
@@ -40,7 +44,12 @@ def get_proxy_s():
     :return: 随机代理
     """
     conn = get_conn()
-    return str(conn.srandmember("freeProxy:AfterVerifyOKhttps", 1))
+    result = conn.srandmember("freeProxy:AfterVerifyOKhttps", 1)
+    if result:
+        ip = result[0]
+        return ip
+    else:
+        return "HTTPS proxies is empty"
 
 
 @app.route('/count')
