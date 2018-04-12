@@ -83,7 +83,7 @@ if __name__ == '__main__':
     print(dir())
     for attr in dir():
         if attr.startswith("proxy__"):
-            if attr not in ["proxy__test"]:
+            if attr not in ["proxy__test", "proxy__nianshao"]:
                 # 所有proxy__开头的方法都加入jobs列表
                 jobs.append(threading.Thread(target=locals()[attr], args=(CONN_REDIS,)))
 
