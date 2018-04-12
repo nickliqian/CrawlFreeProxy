@@ -1,6 +1,6 @@
 from flask import Flask, g, render_template
 from multiprocessing import Process
-from module import crawlIP, verifyIP
+from module import crawlIP, verifyIP, verifyHTTPSip
 import redis
 import threading
 from tools.settings import *
@@ -96,5 +96,8 @@ if __name__ == '__main__':
 
     verify_process = Process(target=verifyIP.main)
     verify_process.start()
+
+    verify_https_process = Process(target=verifyHTTPSip.main)
+    verify_https_process.start()
 
     app.run(host="0.0.0.0", port=7865)

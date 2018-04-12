@@ -195,3 +195,32 @@ def test_http_proxy(proxy):
             i += 1
     print("----------------Test end-------------------")
     return flag
+
+
+# https proxy test
+def test_https_proxy(proxy):
+    proxies = {"https": proxy}
+
+    url = "https://www.baidu.com"
+    print("*Start proxy test: ", proxies)
+    flag = True
+
+    i = 1
+    while i<=3:
+        print("---------------Test %d-----------------" % i)
+        try:
+            response = requests.get(url, proxies=proxies, timeout=10)
+            if response.status_code == 200:
+                print("*Response is 200,", proxies, "pass the test!")
+                flag = True
+                break
+            else:
+                print("Response code is %d, sleep 60s and continue" % response.status_code)
+                time.sleep(60)
+                i += 1
+        except Exception as e:
+            print("Something Error as", e)
+            flag = False
+            i += 1
+    print("----------------Test end-------------------")
+    return flag
