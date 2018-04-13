@@ -76,7 +76,7 @@ def fresh_proxy_thread_task():
                                           args=(name, http_before, http_after_ok, http_after_bad, test_http_proxy,)))
     # pass proxy反复验证线程，周期半小时
     name1 = "Thread-ok_http_verify"
-    job_ok_http = threading.Thread(target=verify_fresh_proxy,
+    job_ok_http = threading.Thread(target=verify_ok_proxy,
                                    args=(name1, https_before, https_after_ok, https_after_bad, test_http_proxy,))
 
     # HTTPS线程
@@ -87,7 +87,7 @@ def fresh_proxy_thread_task():
                                            args=(name, https_before, https_after_ok, https_after_bad, test_https_proxy,)))
     # pass proxy反复验证线程，周期半小时
     name2 = "Thread-ok_https_verify"
-    job_ok_https = threading.Thread(target=verify_fresh_proxy,
+    job_ok_https = threading.Thread(target=verify_ok_proxy,
                                     args=(name2, https_before, https_after_ok, https_after_bad, test_https_proxy,))
 
     # 开启多线程
