@@ -64,38 +64,37 @@ def fresh_proxy_thread_task():
     https_after_bad = "freeProxy_Bad:AfterVerifyFailhttps"
 
     # 线程配置
-    jobs_http = []
-    jobs_https = []
+    jobs = []
     num = 5
 
-    # HTTP线程
-    # 新proxy验证线程
     for i in range(1, num+1):
-        name = "Thread-http" + str(i)
-        jobs_http.append(threading.Thread(target=verify_fresh_proxy,
-                                          args=(name, http_before, http_after_ok, http_after_bad, test_http_proxy,)))
+        # HTTP线程
+        name_a = "Thread-http" + str(i)
+        jobs.append(threading.Thread(target=verify_fresh_proxy,
+                                          args=(name_a, http_before, http_after_ok, http_after_bad, test_http_proxy,)))
+        # HTTPS线程
+        name_b = "Thread-https" + str(i)
+        jobs.append(threading.Thread(target=verify_fresh_proxy,
+                                           args=(name_b, https_before, https_after_ok, https_after_bad, test_https_proxy,)))
+
     # pass proxy反复验证线程，周期半小时
     name1 = "Thread-ok_http_verify"
-    job_ok_http = threading.Thread(target=verify_ok_proxy,
-                                   args=(name1, https_before, https_after_ok, https_after_bad, test_http_proxy,))
+    jobs.append(threading.Thread(target=verify_ok_proxy,
+                                   args=(name1, https_before, https_after_ok, https_after_bad, test_http_proxy,)))
 
-    # HTTPS线程
-    # 新proxy验证线程
-    for i in range(1, num+1):
-        name = "Thread-https" + str(i)
-        jobs_https.append(threading.Thread(target=verify_fresh_proxy,
-                                           args=(name, https_before, https_after_ok, https_after_bad, test_https_proxy,)))
     # pass proxy反复验证线程，周期半小时
     name2 = "Thread-ok_https_verify"
-    job_ok_https = threading.Thread(target=verify_ok_proxy,
-                                    args=(name2, https_before, https_after_ok, https_after_bad, test_https_proxy,))
+    jobs.append(threading.Thread(target=verify_ok_proxy,
+                                    args=(name2, https_before, https_after_ok, https_after_bad, test_https_proxy,)))
 
+    print(jobs)
+    print(len(jobs))
     # 开启多线程
-    for t in jobs_http:
+    for t in jobs:
         t.start()
-    job_ok_http.start()
+    for t in jobs:
+        t.join()
 
-    for t in jobs_https:
-        t.start()
-    job_ok_https.start()
+
+
 

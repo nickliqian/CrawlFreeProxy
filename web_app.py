@@ -91,4 +91,5 @@ if __name__ == '__main__':
     verify_process = Process(target=verifyIP.fresh_proxy_thread_task)
     verify_process.start()
 
+    # 开启web
     app.run(host="0.0.0.0", port=7865)
