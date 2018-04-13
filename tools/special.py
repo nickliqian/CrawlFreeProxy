@@ -1,15 +1,14 @@
 from bs4 import BeautifulSoup
 from tools.common import BasePage
 import time
+import redis
+from tools.common import wait, save_proxy_redis
 
 
 # 全网代理 扩展自定义函数应对反爬措施
 class QuanWang(BasePage):
     def __init__(self, *args, **kwargs):
         super(QuanWang, self).__init__(*args, **kwargs)
-        self.base_url = "http://www.goubanjia.com/free/gngn/index"
-        self.base_url_tail = ".shtml"
-        self.site_name = "QuanWang"
         self.sync_support = False
         self.cycle = '10min'
         self.redis_store = "freeProxy:BeforeVerify"

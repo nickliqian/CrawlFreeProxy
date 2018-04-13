@@ -129,11 +129,13 @@ def proxy__wuyou(CONN_REDIS):
     return items
 
 
-# 全网代理 10min 5
+# 全网代理 10min
 def proxy__quanwang(CONN_REDIS):
-    start = 1
-    end = 20
-    cycle = "20min"
-    Spider = QuanWang(start=start, end=end, cycle=cycle)
+    base_url = "http://www.goubanjia.com/"
+    base_url_tail = ''
+    start = ''
+    end = ''
+    site_name = 'QuanWang'
+    Spider = QuanWang(base_url, base_url_tail, start, end, site_name)
     items = Spider.run(CONN_REDIS)
     return items
