@@ -173,7 +173,7 @@ def test_http_proxy(proxy):
     proxies = {"http": proxy}
 
     url = "http://www.baidu.com"
-    print("*Start proxy test: ", proxies)
+    print("Connect to proxy: ", proxies)
     flag = True
 
     i = 1
