@@ -37,7 +37,6 @@ def verify_ok_proxy(name, before, after_ok, after_bad, call_func):
     CONN_REDIS = redis.Redis(connection_pool=POOL)
     while True:
         print("INFO: Start proxy verify {}", format(name))
-        # 取出一个ip进行测试
         all_ip = CONN_REDIS.smembers(after_ok)
         for ip_b in all_ip:
             proxy = str(ip_b, encoding="utf-8")
@@ -48,6 +47,26 @@ def verify_ok_proxy(name, before, after_ok, after_bad, call_func):
                 print("INFO: {} Proxy {} removed from {}".format(name, proxy, after_ok))
             else:
                 print("INFO: {} Proxy {} is OK".format(name, proxy))
+        print("{} 等待下一轮验证".format(name))
+        time.sleep(1800)
+
+
+# 测试之前通过的IP，周期半小时
+def verify_bad_proxy(name, before, after_ok, after_bad, call_func):
+    print(before)
+    # 连接redis数据库
+    POOL = redis.ConnectionPool(host='127.0.0.1', port=6379)
+    CONN_REDIS = redis.Redis(connection_pool=POOL)
+    while True:
+        print("INFO: Start proxy verify {}", format(name))
+        all_ip = CONN_REDIS.smembers(after_bad)
+        for ip_b in all_ip:
+            proxy = str(ip_b, encoding="utf-8")
+            flag = call_func(proxy)
+            if flag:
+                CONN_REDIS.srem(after_bad, proxy)
+                CONN_REDIS.sadd(after_ok, proxy)
+                print("INFO: {} Proxy {} removed from {}".format(name, proxy, after_bad))
         print("{} 等待下一轮验证".format(name))
         time.sleep(1800)
 
@@ -77,18 +96,22 @@ def fresh_proxy_thread_task():
         jobs.append(threading.Thread(target=verify_fresh_proxy,
                                            args=(name_b, https_before, https_after_ok, https_after_bad, test_https_proxy,)))
 
-    # pass proxy反复验证线程，周期半小时
+    # PASS proxy反复验证线程，周期半小时
     name1 = "Thread-ok_http_verify"
     jobs.append(threading.Thread(target=verify_ok_proxy,
-                                   args=(name1, https_before, https_after_ok, https_after_bad, test_http_proxy,)))
-
-    # pass proxy反复验证线程，周期半小时
+                                   args=(name1, http_before, http_after_ok, http_after_bad, test_http_proxy,)))
     name2 = "Thread-ok_https_verify"
     jobs.append(threading.Thread(target=verify_ok_proxy,
                                     args=(name2, https_before, https_after_ok, https_after_bad, test_https_proxy,)))
 
-    print(jobs)
-    print(len(jobs))
+    # BAD proxy反复验证线程，周期半小时
+    name3 = "Thread-bad_http_verify"
+    jobs.append(threading.Thread(target=verify_bad_proxy,
+                                   args=(name3, http_before, http_after_ok, http_after_bad, test_http_proxy,)))
+    name4 = "Thread-bad_https_verify"
+    jobs.append(threading.Thread(target=verify_bad_proxy,
+                                    args=(name4, https_before, https_after_ok, https_after_bad, test_https_proxy,)))
+
     # 开启多线程
     for t in jobs:
         t.start()

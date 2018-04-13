@@ -80,7 +80,7 @@ if __name__ == '__main__':
     for attr in dir():
         if attr.startswith("proxy__"):
             # nianshao.me网站已经关闭，这里弃用
-            if attr not in ["proxy__test", "proxy__nianshao"]:
+            if attr not in ["proxy__test", "proxy__nianshao", "proxy__quanwang"]:
                 # 所有proxy__开头的方法都加入jobs列表
                 jobs.append(threading.Thread(target=locals()[attr], args=(CONN_REDIS,)))
     # 开启多线程
