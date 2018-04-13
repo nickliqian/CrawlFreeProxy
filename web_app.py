@@ -1,6 +1,6 @@
 from flask import Flask, g, render_template
 from multiprocessing import Process
-from module import crawlIP, verifyIP, verifyHTTPSip
+from module import verifyIP
 import redis
 import threading
 from tools.settings import *
@@ -23,12 +23,9 @@ def index():
     return render_template('index.html')
 
 
+# 随机http代理
 @app.route('/random_http')
 def get_proxy():
-    """
-    Get a proxy
-    :return: 随机代理
-    """
     conn = get_conn()
     result = conn.srandmember("freeProxy:AfterVerifyOKhttp", 1)
     if result:
@@ -37,12 +34,10 @@ def get_proxy():
     else:
         return "HTTP proxies is empty"
 
+
+# 随机https代理
 @app.route('/random_https')
 def get_proxy_s():
-    """
-    Get a proxy
-    :return: 随机代理
-    """
     conn = get_conn()
     result = conn.srandmember("freeProxy:AfterVerifyOKhttps", 1)
     if result:
@@ -52,19 +47,10 @@ def get_proxy_s():
         return "HTTPS proxies is empty"
 
 
+# 代理池总量
 @app.route('/count')
 def get_counts():
-    """
-    Get the count of proxies
-    :return: 代理池总量
-    """
     conn = get_conn()
-    """
-    1) "freeProxy:BeforeVerifyhttp"
-2) "freeProxy:BeforeVerifyhttps"
-3) "freeProxy_Bad:AfterVerifyFailhttp"
-
-    """
     http_before = conn.scard("freeProxy:BeforeVerifyhttp")
     https_before = conn.scard("freeProxy:BeforeVerifyhttps")
     http_after_bad = conn.scard("freeProxy_Bad:AfterVerifyFailhttp")
@@ -87,6 +73,7 @@ if __name__ == '__main__':
     POOL = redis.ConnectionPool(host='127.0.0.1', port=6379)
     CONN_REDIS = redis.Redis(connection_pool=POOL)
 
+    # 多线程采集免费代理
     # 动态获取所有方法
     jobs = []
     print(dir())
@@ -96,18 +83,12 @@ if __name__ == '__main__':
             if attr not in ["proxy__test", "proxy__nianshao"]:
                 # 所有proxy__开头的方法都加入jobs列表
                 jobs.append(threading.Thread(target=locals()[attr], args=(CONN_REDIS,)))
-
     # 开启多线程
     for t in jobs:
         t.start()
 
-    # crawl_process = Process(target=crawlIP.main, args=(func_var,))
-    # crawl_process.start()
-
-    verify_process = Process(target=verifyIP.main)
+    # 开启验证线程
+    verify_process = Process(target=verifyIP.fresh_proxy_thread_task)
     verify_process.start()
-
-    verify_https_process = Process(target=verifyHTTPSip.main)
-    verify_https_process.start()
 
     app.run(host="0.0.0.0", port=7865)

@@ -35,7 +35,7 @@ class QuanWang(BasePage):
                 break
             except Exception as e:
                 print(e, response.url)
-                with open("./quanwangerror.html", "w") as f:
+                with open("./test/quanwangerror.html", "w") as f:
                     f.write(response.url)
                     f.write(response.text)
                 time.sleep(300)
